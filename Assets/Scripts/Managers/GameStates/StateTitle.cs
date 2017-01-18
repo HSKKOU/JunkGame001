@@ -1,4 +1,6 @@
-﻿using Utils.StateMachine;
+﻿using UnityEngine.SceneManagement;
+
+using Utils.StateMachine;
 
 namespace Game
 {
@@ -10,6 +12,8 @@ namespace Game
 
       public override void Enter()
       {
+        SceneManager.LoadSceneAsync(SceneExt.E2S(Scenes.Title), LoadSceneMode.Additive);
+
         // for Debug
         owner.ChangeState(GameState.Ready);
       }

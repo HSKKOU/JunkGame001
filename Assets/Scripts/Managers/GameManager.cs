@@ -16,7 +16,7 @@ namespace Game
     Result,
     Num
   }
- 
+   
   public partial class GameManager : StatefulSingletonMono<GameManager, GameState>
   {
 
