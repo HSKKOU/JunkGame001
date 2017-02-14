@@ -1,0 +1,135 @@
+@startuml
+
+namespace GameManager {
+  enum GameState {
+    + Init
+    + Title
+    + Ready
+    + Playing
+    + Result
+    + Finished
+    + [Num]
+  }
+
+  abstract class AGameManager extends Player.IGameStateProvider {
+  }
+
+  class DebugGameManager extends AGameManager {
+  }
+
+  class MainGameManager extends AGameManager {
+  }
+
+  class GameTimeManager {
+  }
+
+  class BallManager {
+  }
+  AGameManager --> GameTimeManager
+  AGameManager --> BallManager
+}
+
+namespace Player {
+
+  namespace Input {
+    interface IInputEventProvider {
+      + FloatReactiveProperty RotateEvent
+    }
+
+    class AiInputEventProvider extends IInputEventProvider {
+    }
+
+    class DebugKeyInputEventProvider extends IInputEventProvider {
+    }
+
+    class PlayerInputEventProvider extends IInputEventProvider {
+    }
+  }
+
+
+  class PlayerCore {
+    + IntReactiveProperty OnRotateEvent
+    + ReactiveProperty<BallInfo> OnCollisionEvent
+    + ReactiveProperty<DiscLayout> OnChangeDiscLayout
+    + void Rotate(float angle)
+    + void CollideWith(BallInfo ballInfo)
+    + void ChangeDiscLayout(DiscLayout discLayout)
+  }
+  PlayerCore --o DiscLayout
+
+  abstract class APlayerComponent {
+    # void OnInitialize()
+  }
+  APlayerComponent --> Player.Input.IInputEventProvider
+  APlayerComponent --> PlayerCore
+
+  class PlayerMover extends APlayerComponent {
+  }
+  class DiscColorRanger extends APlayerComponent {
+  }
+  class PlayerEffectEmitter extends APlayerComponent {
+  }
+  PlayerMover --> PlayerCore
+  DiscColorRanger --> PlayerCore
+  PlayerEffectEmitter --> PlayerCore
+
+  class DiscLayoutElem {
+    + DiscColor color
+    + float angle
+  }
+  class DiscLayout {
+    - List<DiscLayoutElem> discColorList
+    + static DiscLayout CreateLayout(DiscColor[] colors, float[] angles)
+  }
+  DiscLayoutElem o-- DiscLayout
+
+  interface IGameStateProvider {
+    + ReactiveProperty<GameState> OnChangeGameState
+  }
+  IGameStateProvider <-- PlayerCore
+}
+
+namespace Ball {
+  class BallInfo(struct) {
+    + DiscColor color
+    + Vector2 defaultPosXZ
+  }
+
+  abstract class ABallCompoent {
+    # void OnInitialize()
+  }
+
+  class BallMover extends ABallCompoent {
+  }
+  class BallShadowController extends ABallCompoent {
+  }
+
+  class BallController extends ABallCompoent {
+    + ReactiveProperty<BallInfo> OnCollisionWithDisc
+  }
+
+  class AllBallsMover {
+  }
+  AllBallsMover --o BallMover
+  GameManager.BallManager --> AllBallsMover
+  GameManager.BallManager --o BallController
+
+  abstract class ABallScheduler {
+  }
+  class TitleBallScheduler extends ABallScheduler {
+  }
+  class AGameBallScheduler extends ABallScheduler {
+  }
+}
+
+namespace Constants {
+  enum DiscColor {
+    + Red
+    + Blue
+    + Green
+    + Yellow
+    + Num
+  }
+}
+
+@enduml
